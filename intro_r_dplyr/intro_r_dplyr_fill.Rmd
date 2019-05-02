@@ -1,0 +1,430 @@
+---
+title: "Introduction to R and dplyr"
+author: "Jasmine"
+date: '2019-04-03'
+output: html_document
+---
+## To do before hand:
+1. install tidyverse and rstudio:
+Follow setup instructions for R and Rstudio if you don't have them already: https://datacarpentry.org/R-ecology-lesson/
+
+2. installing packages
+- one time thing (you can use library(tidyverse) to check if it is installed -throws an error if it isn't)
+```{r}
+#uncomment the line below
+#install.packages("tidyverse", "readxl")
+```
+
+## objectives 
+- read in files of different formats
+- apply the help() documentation to helping you learn new functions and debugging
+- identify resources and tactics in debugging your own code
+- using the dplyr library in the tidyverse to manipulate your data in a datafram
+- save your file into a different directory
+
+## Acknowledgements
+This document draws heavily on (and also really good resources for future reference):
+
+- Jenny Bryan: stats professor @ UBC! now at Rstudio [what they forgot in R](https://whattheyforgot.org/index.html)
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [Data Carpentry](https://datacarpentry.org/lessons/#ecology-workshop)
+
+***
+# Workshop Part 1
+
+## R basics
+- Going through them really quickly just so you have an idea of them
+- I have integrated them into the Tidyverse part of the workshop to get you used to seeing them in the wild and actually have context for why it is important
+
+### Rstudio - Integrated Development Environment (IDE)
+- get familiar with the layout
+- R (language) & Rstudio the interface that facillitates your interactions with R
+- usually it is advised to change your "save workspace to .RData on exit" to never to increase reproducibility
+
+### rProjects
+- easier to keep your files together
+- don't need to worry as much with dealing with directries
+
+```{r}
+# Try making one now --> top left with the blue cube
+```
+- it is actually just a file that rstudio knows to identify
+- will work the same way as a folder
+
+
+### Rmarkdown
+- what this file is made with!
+- a slightly different way to run your r code
+- instead of commenting out your text you can write it outside of the code chunk
+```{r}
+#this is a code chunk
+algae <-  2 + 2
+#your r code goes in here
+```
+
+use ctrl + alt + i to make a new code chunk here:
+
+```{r}
+
+```
+
+
+- To your right is the `Environment` which shows you what is in `memory` containing the variables that R is currently holding for you that you can ask for
+- bellow is the `console` although using Rmarkdown reduces the need for it but you can still see the lines of code was sent there to be run (think of the Rmd file as your scrap paper)
+
+***
+
+If you ever need a refresher...
+ 
+#### shortcuts cheatsheet (on Mac)
+ __replace cmd with ctrl for windows in most cases__
+ 1. run a cell `shift + enter`
+ 2. assignment <- `alt + -`
+ 3. multi-line select `ctrl + option + arrow key`
+ 4. pipe %>% `cmd + shift + m`
+
+### Types
+#### Objectives
+- figuring out what type an variable is using the function `str()`
+
+Often over looked but pretty important... a major cause of errors
+- will be highlighted in Rstudio (good way to double check)
+- you can also check if something has a certain type by using the ```str()``` (structure) function
+- functions are a command that tells R to excute a set of tasks previously defined
+- functions are structured like this: name_of_fn(argument/parameter)
+
+```{r types}
+str(4) 
+str(3.5)
+numerical <- 3.5
+str("hello")
+
+numerical <- as.character(numerical)
+numerical
+
+as.numeric(numerical)
+```
+* note because I came from Python I may accidently use the other terms
+
+You can also change the types by using ```as.[insert type here]```
+- you can use `tab` completion to 
+```{r changing types}
+
+```
+
+#### Practice
+try our changing the type numeric -> character
+```{r}
+
+```
+
+keep all of this in mind we will be seeing this in the next part
+
+### Opening Files
+#### objectives
+- opening different file types
+- directories
+
+***
+
+#### CSV - comma seperated files
+- most functions that imports files into R start with `read`
+- use that to our advantage when using tab completion even when we don't know what the function might be called exactly
+```{r}
+ptm <- read.csv("data/PTM-Master_List.csv")
+getwd()
+
+help(read.csv)
+```
+
+not sure how to use it? call for help!
+- name_of_function{what package it belongs to}
+- description
+- arguments
+- scroll to the bottom for examples
+```{r}
+
+```
+
+now use the function:
+```{r results="hide"}
+
+```
+
+#### Practice
+apply what we learned in types to check to see what type is df
+```{r}
+str(ptm)
+```
+Congrats! It is a dataframe! Another type of data (like character, logical etc.) and each column has a type
+
+#### Directories
+```{r}
+
+```
+
+__note__: 
+*sketch this out*
+directories - "folder"
+- important to know where your "folder" is
+
+this is the path - the location of your folder:
+```{r}
+
+```
+your files should be in the location specified
+
+__Pro tip__: use Rprojects to help you get organized and you can worry less about directories and easier to share your work
+- although you can use `setwd()` but it is generally not recommended because other people may have a different file structure than you
+- there are packages like `here()` that make it easy for you to get your path
+
+```{r results = "hide"}
+
+```
+
+### read_csv (tidyverse)
+- Tidyverse also includes a read csv function
+- they can also be loaded seperately
+```{r}
+library(tidyverse)
+
+ptm_1 <- read_csv("data/PTM-Master_List.csv")
+```
+
+***
+### Practice
+Apply what you learned to a similar function that works with excel files
+- you will need the library readxl
+```{r}
+# note - there is a file .xlsx in the data folder for you already
+library(readxl)
+
+#load your package from library
+#error? remember to install.packages()
+
+
+
+#use tab completion to your advantage to find what function will work
+
+ptm_xl <- read_xlsx("data/PTM - Master List.xlsx", skip = 1, sheet = 2)
+
+help(read_xlsx)
+#need help with that function?
+
+
+
+#use the function and store it as df_xlsx
+
+
+
+```
+
+### navigating your dataframe
+Get a preview of what is inside by using `head()` and `tail()` to see the first few and last few rows
+```{r view data}
+head(ptm)
+tail(ptm)
+```
+
+Want to know the names of your columns?
+```{r}
+names(ptm)
+```
+
+Need to refer to a particular row? `DataFrameName$ColumnName`
+__Pro tip:__ use tab complete to find column names after your type the $
+```{r results="hide"}
+ptm$Locality
+
+levels(ptm$Locality)
+```
+__Pro tip:__ weird column names with spaces? use '` `' around the Column name
+
+#### Practice
+- try doing this with the df_xlsx dataframe
+```{r}
+
+```
+
+***
+#### BRAIN BREAK
+***
+### Workshop part 2
+
+### dplyr package
+mainly used for cleaning up your data and manipulating your data frame
+- how to get certain rows you want using `filter()`
+- how to get summary statistics using `group_by()` and `summarise()`
+- how to get columns you want `select()`
+
+#### filter()
+
+##### `==` equals
+
+Quick primer on evaluating logicals
+```{r}
+"Red" == "Red"
+"Red" == "red"
+"Red" != "Red"
+
+```
+
+This applies to when we want to filter something out of the dataframe
+- if it evaluates to `TRUE` then the row will be kept
+```{r}
+filter(ptm, ptm$Red.Green.Brown == "Red")
+
+
+```
+
+##### booleans 
+- ! (not)
+- & and
+- | or
+```{r results="hide"}
+#Filter only keeps rows that evaluate to TRUE
+
+#not 
+"Red" != "Red"
+"Red" != "Blue"
+
+
+# or
+TRUE | TRUE
+TRUE | FALSE
+FALSE | FALSE
+filter(ptm, ptm$Red.Green.Brown == "Red" | ptm$Red.Green.Brown == "Brown")
+
+# and
+TRUE  & FALSE
+TRUE  & TRUE
+FALSE  & FALSE
+
+
+# TRUE in all the cases
+
+#sometimes error messages are helpful
+#filter(df, df$`Red.Green.Brown` = "Red")
+```
+
+tying it together
+- this does not work as expected
+```{r results="hide"}
+filter(ptm, ptm$PTM. > 500)
+
+str(ptm$PTM.)
+
+ptm$PTM. <- as.numeric(ptm$PTM.)
+
+str(ptm$PTM.)
+
+filter(ptm, ptm$PTM. > 500)
+#read the error message
+```
+
+let's check the type of the `df$PTM.`
+```{r results="hide"}
+
+```
+
+we can fix this by changing it to a factor
+```{r results="hide"}
+
+```
+
+#### Practice
+try filtering for all columns that are not brown algae and between PTM 34 - PTM 400
+```{r}
+
+```
+
+##### removing NA
+- NA is a data type but slightly different than the rest
+- data frames that are read in automatically converts empty cells to NA in read_csv
+```{r}
+filter(ptm_1 , is.na(ptm_1$`Final determination`))
+```
+
+##### `%in%`
+a special character
+```{r results="hide"}
+want <- c("Red","Brown")
+
+new <- filter(ptm, ptm$Red.Green.Brown %in% want)
+
+View(new)
+```
+
+#### group_by() & summarize()
+- usually used together because on it's own isn't terribly useful
+- we can use it to get the number of rows using `n()`
+```{r}
+grouped <- group_by(ptm, ptm$Final.determination)
+
+summarise(grouped, count = n())
+
+group_by(ptm, ptm$Red.Green.Brown) %>% 
+  dplyr::summarise(count = n())
+```
+
+__note__: becareful if you have plyr (another library) - reading what is outputted is helpful
+```{r}
+#library(plyr)
+# you can use the :: notation to specify which one you want
+#dplyr::summarise(df, number = n())
+```
+
+#### introduction to pipes (less naming!)
+- think of ` %>% ` as then if you are reading it aloud
+- you can use the pipe to "pass one thing that you are using along
+
+```{r results="hide"}
+
+```
+
+you can do the same with `count() mean(), max(), min()` to get summary statistics
+
+#### select()
+the columns you want
+```{r results="hide"}
+select(ptm, -Final.determination )
+```
+
+#### mutate()
+```{r}
+test <- mutate(ptm, new_name = paste("PTM",PTM., sep = ","),
+               year = year(date))
+
+c("PTM",123)
+
+test$new_name
+```
+
+#### Practice
+1. keep only the rows with ther Other.collectors with `Liam Coleman`
+2. combine the main collector and the other collectors column to a new column called `all_collectors`
+```{r}
+
+```
+
+#### Looking for Help (just in case I forget to cover it)
+1. Read the error message and go to the line
+2. Google is your best friend
+  - Try typing in the error message
+  - look into the help documentation to see what examples are given and what arguments it takes
+
+***
+
+#### Saving your file (xlsx, csv)
+look at the File tab to see where it is saved
+```{r}
+write_csv(grouped, "results/new_ptm.csv")
+#get it into the folder
+help(write_csv)
+
+library(openxlsx)
+
+group_by(ptm, ptm$Red.Green.Brown) %>% 
+  summarise()
+
+```
